@@ -34,12 +34,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Build Docker image
         run: |
           docker build -t cicdapp .
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Stop and remove existing container
+        run: |
+          docker stop cicdapp || true
+          docker rm cicdapp || true
 
       - name: Run Docker container
         run: |
